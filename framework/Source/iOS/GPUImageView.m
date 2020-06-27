@@ -22,6 +22,8 @@
     GLfloat backgroundColorRed, backgroundColorGreen, backgroundColorBlue, backgroundColorAlpha;
 
     CGSize boundsSizeAtFrameBufferEpoch;
+    
+    CGRect currentViewBounds;
 }
 
 @property (assign, nonatomic) NSUInteger aspectRatio;
@@ -79,6 +81,8 @@
 
 - (void)commonInit;
 {
+    currentViewBounds = self.bounds;
+    
     // Set scaling to account for Retina display	
     if ([self respondsToSelector:@selector(setContentScaleFactor:)])
     {
@@ -132,6 +136,8 @@
 
 - (void)layoutSubviews {
     [super layoutSubviews];
+    
+    currentViewBounds = self.bounds;
     
     // The frame buffer needs to be trashed and re-created when the view size changes.
     if (!CGSizeEqualToSize(self.bounds.size, boundsSizeAtFrameBufferEpoch) &&
@@ -235,12 +241,12 @@
     runSynchronouslyOnVideoProcessingQueue(^{
         CGFloat heightScaling, widthScaling;
         
-        CGSize currentViewSize = self.bounds.size;
+        CGSize currentViewSize = currentViewBounds.size;
         
         //    CGFloat imageAspectRatio = inputImageSize.width / inputImageSize.height;
         //    CGFloat viewAspectRatio = currentViewSize.width / currentViewSize.height;
         
-        CGRect insetRect = AVMakeRectWithAspectRatioInsideRect(inputImageSize, self.bounds);
+        CGRect insetRect = AVMakeRectWithAspectRatioInsideRect(inputImageSize, currentViewBounds);
         
         switch(_fillMode)
         {
